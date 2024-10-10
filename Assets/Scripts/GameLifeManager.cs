@@ -21,8 +21,9 @@ public class GameLifeManager : MonoBehaviour
         LifeCheck();
     }
 
-    void LifeGiver()
+    void LifeGiver() //Para hacer pruebas del juego de la vida
     {
+        
         int rnd;
         for (int i = 0; i < cellNum; i++)
         {
