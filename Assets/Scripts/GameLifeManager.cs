@@ -9,53 +9,38 @@ public class GameLifeManager : MonoBehaviour
     public int cellNum;
     //public SpriteRenderer render;
     public bool test;
-    Hashtable totalCells; 
+    Dictionary<int, bool> totalCells;
     void Start()
     {
+        totalCells = new Dictionary<int, bool>(); 
         LifeGiver();
     }
-    /*
-    public void ChangeColor(bool state)
-    {
-        if(state)
-        {
-            render.color = AliveColor;
-        }
-
-        else 
-        {
-            render.color= DeadColor;
-        }
-    }
-    */
 
     void Update()
     {
-        //ChangeColor(test);
         LifeCheck();
     }
 
     void LifeGiver()
     {
-        int rnd; 
-        for(int i = 0; i < cellNum; i++) 
+        int rnd;
+        for (int i = 0; i < cellNum; i++)
         {
             rnd = Random.Range(0, 2);
             if (rnd == 0)
             {
-                totalCells.Add(i, "Celula esta muerta");   
+                totalCells.Add(i, true);
             }
             else
             {
-                totalCells.Add(i, "Celula  esta viva");
+                totalCells.Add(i, false);
             }
-            Debug.Log(totalCells[i].ToString());
-
+            Debug.Log($"La celula {i} esta: {totalCells[i]} "); 
         }
     }
 
     void LifeCheck()
     {
-
+        
     }
 }
