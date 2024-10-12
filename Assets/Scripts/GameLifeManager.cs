@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class GameLifeManager : MonoBehaviour
@@ -8,14 +9,16 @@ public class GameLifeManager : MonoBehaviour
     public Color DeadColor;
     public int cellNum;
     [SerializeField] private GameObject cellPrefab;
+    private GameObject[,] cellsOnScreen; 
     bool[,] totalCells;
-    [SerializeField]private float TimeToWait; 
+    [SerializeField]private float timeToWait;
     void Start()
     {
         totalCells = new bool[cellNum, cellNum];
+        cellsOnScreen = new GameObject[cellNum, cellNum];
         LifeGiver();
+        CreateCell();
         Invoke("StartGameofLife", 4f);
-
     }
 
     void LifeGiver()//Para hacer pruebas del juego de la vida
@@ -96,7 +99,7 @@ public class GameLifeManager : MonoBehaviour
         totalCells = nextGeneration;
     }
 
-    void StartGameofLife()
+    public void StartGameofLife()
     {
         StartCoroutine(NewGeneration());
     }
@@ -105,10 +108,41 @@ public class GameLifeManager : MonoBehaviour
         while (true)
         {
             LifeCheck();
-            yield return new WaitForSeconds(TimeToWait);
+            ShowSimulation();
+            yield return new WaitForSeconds(timeToWait);
         }
-
     }
 
+    void CreateCell() //Crea todas las células y las agrega al arreglo de celulas en pantalla. 
+    {
 
+        for ( int i = 0;i < cellNum; i++)
+        {
+            for(int j = 0;j < cellNum; j++)
+            {
+                Vector3 position = new Vector3(i, j, 0);
+                GameObject cell = Instantiate(cellPrefab,position, Quaternion.identity);
+                cell.GetComponent<SpriteRenderer>().color= DeadColor;
+                cellsOnScreen[i,j] = cell;
+            }
+        }
+    }
+
+    public void ShowSimulation()
+    {
+        for(int i = 0; i< cellNum; i++)
+        {
+            for(int j = 0; j < cellNum; j++)
+            {
+                if (totalCells[i, j])
+                {
+                    cellsOnScreen[i,j].GetComponent<SpriteRenderer>().color = AliveColor;
+                }
+                else
+                {
+                    cellsOnScreen[i, j].GetComponent<SpriteRenderer>().color = DeadColor;
+                }
+            }
+        }
+    }
 }
