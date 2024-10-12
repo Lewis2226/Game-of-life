@@ -7,41 +7,108 @@ public class GameLifeManager : MonoBehaviour
     public Color AliveColor;
     public Color DeadColor;
     public int cellNum;
-    //public SpriteRenderer render;
-    public bool test;
-    Dictionary<int, bool> totalCells;
+    [SerializeField] private GameObject cellPrefab;
+    bool[,] totalCells;
+    [SerializeField]private float TimeToWait; 
     void Start()
     {
-        totalCells = new Dictionary<int, bool>(); 
+        totalCells = new bool[cellNum, cellNum];
         LifeGiver();
+        Invoke("StartGameofLife", 4f);
+
     }
 
-    void Update()
+    void LifeGiver()//Para hacer pruebas del juego de la vida
     {
-        LifeCheck();
-    }
-
-    void LifeGiver() //Para hacer pruebas del juego de la vida
-    {
-        
         int rnd;
         for (int i = 0; i < cellNum; i++)
         {
-            rnd = Random.Range(0, 2);
-            if (rnd == 0)
+            for (int j = 0; j < cellNum; j++)
             {
-                totalCells.Add(i, true);
+              rnd = Random.Range(0, 2);
+              if (rnd == 0)//La célula esta muerta
+              {
+                 totalCells[i, j] = true;
+              }
+              else//La célula esta muerta
+              {
+                 totalCells[i, j] = false;
+              }
             }
-            else
-            {
-                totalCells.Add(i, false);
-            }
-            Debug.Log($"La celula {i} esta: {totalCells[i]} "); 
         }
     }
 
-    void LifeCheck()
+    int NeighborsAlive(int x, int y)//Cuenta el total de células vivas alrededor de una célula en especial
     {
-        
+        int neighborslife = 0;
+
+        for(int i = -1; i <= 1; i++)  
+        {
+            for(int j = -1; j <= 1; j++)  
+            {
+                if(i == 0 && j == 0)
+                    continue;  
+
+                int PosX = x + i;
+                int PosY = y + j;
+
+                if (PosX >= 0 && PosX < totalCells.GetLength(0) && PosY >= 0 && PosY < totalCells.GetLength(1))
+                {
+                    if (totalCells[PosX, PosY])  
+                    {
+                        neighborslife++;
+                    }
+                }
+            }
+        }
+        return neighborslife;
     }
+
+    void LifeCheck()//Aplica las reglas de Conway
+    {
+        bool[,] nextGeneration = new bool[cellNum, cellNum];
+        for (int i = 0; i < cellNum; i++) 
+        {
+            for (int j = 0; j < cellNum; j++) 
+            {
+                int aliveCells = NeighborsAlive(i, j);
+
+                if (totalCells[i, j]) // Si la célula esta viva
+                {
+                    if (aliveCells < 2 || aliveCells > 3)//Muere si hay subpoblación o sobrepoblación
+                    {
+                        nextGeneration[i, j] = false;
+                    }
+                    else if (aliveCells == 2 || aliveCells == 3)// Sobrevive si tiene 2 0 3 vecinos
+                    {
+                        nextGeneration[i, j] = true;
+                    }
+                }
+                else // Si la célula está muerta
+                {
+                    if (aliveCells == 3) //Nace una nueva célula si hay 3 vecinos
+                    {
+                        nextGeneration[i, j] = true;
+                    }
+                }
+            }
+        }
+        totalCells = nextGeneration;
+    }
+
+    void StartGameofLife()
+    {
+        StartCoroutine(NewGeneration());
+    }
+    IEnumerator NewGeneration()//Genera la nueva generación de células despues de un lapso de tiempo
+    {
+        while (true)
+        {
+            LifeCheck();
+            yield return new WaitForSeconds(TimeToWait);
+        }
+
+    }
+
+
 }
