@@ -22,14 +22,14 @@ public class GameLifeManager : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0) && !startedGame)
+        if(Input.GetMouseButtonDown(0) && !startedGame)//Permite marcar  las células como vivas o muertas
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             int x = Mathf.FloorToInt(mousePos.x);
             int y = Mathf.FloorToInt(mousePos.y);
 
-            if(x > 0 && x< cellNum && y >0 && y < cellNum) 
+            if(x >= 0 && x < cellNum && y >= 0 && y < cellNum) 
             {
                 totalCells[x, y] =! totalCells[x,y];
                 ShowSimulation();
@@ -37,7 +37,7 @@ public class GameLifeManager : MonoBehaviour
         }
     }
 
-    public void LifeGiver()//Para hacer pruebas del juego de la vida
+    public void LifeGiver()//Genera una configuración inical aleatoria
     {
         int rnd;
         for (int i = 0; i < cellNum; i++)
@@ -55,6 +55,7 @@ public class GameLifeManager : MonoBehaviour
               }
             }
         }
+        ShowSimulation();
     }
 
     int NeighborsAlive(int x, int y)//Cuenta el total de células vivas alrededor de una célula en especial
@@ -92,7 +93,7 @@ public class GameLifeManager : MonoBehaviour
             {
                 int aliveCells = NeighborsAlive(i, j);
 
-                if (totalCells[i, j]) // Si la célula esta viva
+                if (totalCells[i, j])//Si la célula esta viva
                 {
                     if (aliveCells < 2 || aliveCells > 3)//Muere si hay subpoblación o sobrepoblación
                     {
@@ -103,7 +104,7 @@ public class GameLifeManager : MonoBehaviour
                         nextGeneration[i, j] = true;
                     }
                 }
-                else // Si la célula está muerta
+                else//Si la célula está muerta
                 {
                     if (aliveCells == 3) //Nace una nueva célula si hay 3 vecinos
                     {
@@ -115,13 +116,13 @@ public class GameLifeManager : MonoBehaviour
         totalCells = nextGeneration;
     }
 
-    public void StartGameofLife()
+    public void StartGameofLife()//Activa la Corutina
     {
       StartCoroutine(NewGeneration());
     }
     IEnumerator NewGeneration()//Genera la nueva generación de células despues de un lapso de tiempo
     {
-        while (true)
+        while (startedGame)
         {
             LifeCheck();
             ShowSimulation();
@@ -129,7 +130,7 @@ public class GameLifeManager : MonoBehaviour
         }
     }
 
-    void CreateCell() //Crea todas las células y las agrega al arreglo de celulas en pantalla. 
+    void CreateCell()//Crea todas las células y las agrega al arreglo de celulas en pantalla. 
     {
         cellsOnScreen = new GameObject[cellNum, cellNum];
         for ( int i = 0;i < cellNum; i++)
@@ -144,7 +145,7 @@ public class GameLifeManager : MonoBehaviour
         }
     }
 
-    public void ShowSimulation()
+    public void ShowSimulation()//Muestra la simulacion en la pantalla
     {
 
         for(int i = 0; i< cellNum; i++)
@@ -163,8 +164,23 @@ public class GameLifeManager : MonoBehaviour
         }
     }
 
-    public void PauseGame()
+    public void PauseGame()//Hace que se detenga el juego
     {
-        startedGame = !startedGame;
+        startedGame = false;
+        StopAllCoroutines();
+    }
+
+    public void ContinueGame()//Hace que continue el juego
+    {
+        startedGame =true;
+        StartGameofLife();
+
+
+    }
+
+    public void GameStart()//Inicia el juego
+    {
+        startedGame = true;
+        StartGameofLife();
     }
 }
