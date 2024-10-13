@@ -12,16 +12,32 @@ public class GameLifeManager : MonoBehaviour
     private GameObject[,] cellsOnScreen; 
     bool[,] totalCells;
     [SerializeField]private float timeToWait;
+    bool startedGame = false;
+
     void Start()
     {
-        totalCells = new bool[cellNum, cellNum];
-        cellsOnScreen = new GameObject[cellNum, cellNum];
-        LifeGiver();
-        CreateCell();
-        Invoke("StartGameofLife", 4f);
+      totalCells = new bool[cellNum, cellNum];
+      CreateCell();
     }
 
-    void LifeGiver()//Para hacer pruebas del juego de la vida
+    void Update()
+    {
+        if(Input.GetMouseButtonDown(0) && !startedGame)
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            int x = Mathf.FloorToInt(mousePos.x);
+            int y = Mathf.FloorToInt(mousePos.y);
+
+            if(x > 0 && x< cellNum && y >0 && y < cellNum) 
+            {
+                totalCells[x, y] =! totalCells[x,y];
+                ShowSimulation();
+            }
+        }
+    }
+
+    public void LifeGiver()//Para hacer pruebas del juego de la vida
     {
         int rnd;
         for (int i = 0; i < cellNum; i++)
@@ -101,7 +117,7 @@ public class GameLifeManager : MonoBehaviour
 
     public void StartGameofLife()
     {
-        StartCoroutine(NewGeneration());
+      StartCoroutine(NewGeneration());
     }
     IEnumerator NewGeneration()//Genera la nueva generación de células despues de un lapso de tiempo
     {
@@ -115,7 +131,7 @@ public class GameLifeManager : MonoBehaviour
 
     void CreateCell() //Crea todas las células y las agrega al arreglo de celulas en pantalla. 
     {
-
+        cellsOnScreen = new GameObject[cellNum, cellNum];
         for ( int i = 0;i < cellNum; i++)
         {
             for(int j = 0;j < cellNum; j++)
@@ -130,6 +146,7 @@ public class GameLifeManager : MonoBehaviour
 
     public void ShowSimulation()
     {
+
         for(int i = 0; i< cellNum; i++)
         {
             for(int j = 0; j < cellNum; j++)
@@ -144,5 +161,10 @@ public class GameLifeManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void PauseGame()
+    {
+        startedGame = !startedGame;
     }
 }
